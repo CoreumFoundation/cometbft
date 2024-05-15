@@ -186,6 +186,12 @@ func PrometheusMetrics(namespace string, labelsAndValues ...string) *Metrics {
 			Name:      "late_votes",
 			Help:      "LateVotes stores the number of votes that were received by this node that correspond to earlier heights and rounds than this node is currently in.",
 		}, append(labels, "vote_type")).With(labelsAndValues...),
+		ExpectedProposers: prometheus.NewHistogramFrom(stdprometheus.HistogramOpts{
+			Namespace: namespace,
+			Subsystem: MetricsSubsystem,
+			Name:      "expected_proposers",
+			Help:      "ExpectedProposers verifies that expected proposer really proposed the block.",
+		}, append(labels, "validator_address")).With(labelsAndValues...),
 	}
 }
 
@@ -219,5 +225,6 @@ func NopMetrics() *Metrics {
 		ProposalCreateCount:       discard.NewCounter(),
 		RoundVotingPowerPercent:   discard.NewGauge(),
 		LateVotes:                 discard.NewCounter(),
+		ExpectedProposers:         discard.NewHistogram(),
 	}
 }
