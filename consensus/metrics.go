@@ -116,7 +116,7 @@ type Metrics struct {
 	LateVotes metrics.Counter `metrics_labels:"vote_type"`
 
 	// ExpectedProposers verifies that expected proposer really proposed the block.
-	ExpectedProposers metrics.Histogram `metrics_labels:"validator_address"`
+	ExpectedProposers metrics.Histogram `metrics_type:"summary" metrics_labels:"validator_address"`
 }
 
 // RecordConsMetrics uses for recording the block related metrics during fast-sync.

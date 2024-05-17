@@ -186,7 +186,7 @@ func PrometheusMetrics(namespace string, labelsAndValues ...string) *Metrics {
 			Name:      "late_votes",
 			Help:      "LateVotes stores the number of votes that were received by this node that correspond to earlier heights and rounds than this node is currently in.",
 		}, append(labels, "vote_type")).With(labelsAndValues...),
-		ExpectedProposers: prometheus.NewHistogramFrom(stdprometheus.HistogramOpts{
+		ExpectedProposers: prometheus.NewSummaryFrom(stdprometheus.SummaryOpts{
 			Namespace: namespace,
 			Subsystem: MetricsSubsystem,
 			Name:      "expected_proposers",
