@@ -190,7 +190,7 @@ func PrometheusMetrics(namespace string, labelsAndValues ...string) *Metrics {
 			Namespace: namespace,
 			Subsystem: MetricsSubsystem,
 			Name:      "expected_proposers",
-			Help:      "ExpectedProposers verifies that expected proposer really proposed the block.",
+			Help:      "ExpectedProposers shows if actual proposer is equal to expected.",
 		}, append(labels, "validator_address")).With(labelsAndValues...),
 	}
 }
