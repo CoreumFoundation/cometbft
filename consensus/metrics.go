@@ -114,6 +114,9 @@ type Metrics struct {
 	// correspond to earlier heights and rounds than this node is currently
 	// in.
 	LateVotes metrics.Counter `metrics_labels:"vote_type"`
+
+	// ExpectedProposers shows if actual proposer is equal to expected.
+	ExpectedProposers metrics.Histogram `metrics_type:"summary" metrics_labels:"validator_address"`
 }
 
 // RecordConsMetrics uses for recording the block related metrics during fast-sync.
