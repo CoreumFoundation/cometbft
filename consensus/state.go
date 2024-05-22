@@ -1846,6 +1846,12 @@ func (cs *State) recordMetrics(height int64, block *types.Block) {
 	cs.metrics.TotalTxs.Add(float64(len(block.Data.Txs)))
 	cs.metrics.BlockSizeBytes.Set(float64(block.Size()))
 	cs.metrics.CommittedHeight.Set(float64(block.Height))
+
+	var expectedProposerValue float64
+	if bytes.Equal(cs.RoundState.Validators.Proposer.Address.Bytes(), cs.state.Validators.Proposer.Address.Bytes()) {
+		expectedProposerValue = 1.0
+	}
+	cs.metrics.ExpectedProposers.With("validator_address", cs.state.Validators.Proposer.Address.String()).Observe(expectedProposerValue)
 }
 
 //-----------------------------------------------------------------------------

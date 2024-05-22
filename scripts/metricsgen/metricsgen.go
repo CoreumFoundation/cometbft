@@ -22,6 +22,9 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 func init() {
@@ -42,6 +45,7 @@ const metricsPackageName = "github.com/go-kit/kit/metrics"
 
 const (
 	metricNameTag = "metrics_name"
+	metricTypeTag = "metrics_type"
 	labelsTag     = "metrics_labels"
 	bucketTypeTag = "metrics_buckettype"
 	bucketSizeTag = "metrics_bucketsizes"
@@ -75,7 +79,7 @@ func PrometheusMetrics(namespace string, labelsAndValues...string) *Metrics {
 	}
 	return &Metrics{
 		{{ range $metric := .ParsedMetrics }}
-		{{- $metric.FieldName }}: prometheus.New{{ $metric.TypeName }}From(stdprometheus.{{$metric.TypeName }}Opts{
+		{{- $metric.FieldName }}: prometheus.New{{ $metric.MetricType }}From(stdprometheus.{{$metric.MetricType }}Opts{
 			Namespace: namespace,
 			Subsystem: MetricsSubsystem,
 			Name:      "{{$metric.MetricName }}",
@@ -107,6 +111,7 @@ func NopMetrics() *Metrics {
 // ParsedMetricField is the data parsed for a single field of a metric struct.
 type ParsedMetricField struct {
 	TypeName    string
+	MetricType  string
 	FieldName   string
 	MetricName  string
 	Description string
@@ -254,6 +259,7 @@ func parseMetricField(f *ast.Field) ParsedMetricField {
 		MetricName:  extractFieldName(f.Names[0].String(), f.Tag),
 		FieldName:   f.Names[0].String(),
 		TypeName:    extractTypeName(f.Type),
+		MetricType:  extractMetricType(f.Type, f.Tag),
 		Labels:      extractLabels(f.Tag),
 	}
 	if pmf.TypeName == "Histogram" {
@@ -264,6 +270,16 @@ func parseMetricField(f *ast.Field) ParsedMetricField {
 
 func extractTypeName(e ast.Expr) string {
 	return strings.TrimPrefix(path.Ext(types.ExprString(e)), ".")
+}
+
+func extractMetricType(e ast.Expr, tag *ast.BasicLit) string {
+	if tag != nil {
+		t := reflect.StructTag(strings.Trim(tag.Value, "`"))
+		if v := t.Get(metricTypeTag); v != "" {
+			return cases.Title(language.English).String(v)
+		}
+	}
+	return extractTypeName(e)
 }
 
 func extractHelpMessage(cg *ast.CommentGroup) string {
