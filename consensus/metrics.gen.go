@@ -192,6 +192,18 @@ func PrometheusMetrics(namespace string, labelsAndValues ...string) *Metrics {
 			Name:      "expected_proposers",
 			Help:      "ExpectedProposers shows if actual proposer is equal to expected.",
 		}, append(labels, "validator_address")).With(labelsAndValues...),
+		ExpectedVoters: prometheus.NewSummaryFrom(stdprometheus.SummaryOpts{
+			Namespace: namespace,
+			Subsystem: MetricsSubsystem,
+			Name:      "expected_voters",
+			Help:      "ExpectedVoters shows if actual validators vote.",
+		}, append(labels, "validator_address")).With(labelsAndValues...),
+		VoteDeviation: prometheus.NewSummaryFrom(stdprometheus.SummaryOpts{
+			Namespace: namespace,
+			Subsystem: MetricsSubsystem,
+			Name:      "vote_deviation",
+			Help:      "VoteDeviation shows the deviation of vote times.",
+		}, append(labels, "validator_address")).With(labelsAndValues...),
 	}
 }
 
@@ -226,5 +238,7 @@ func NopMetrics() *Metrics {
 		RoundVotingPowerPercent:   discard.NewGauge(),
 		LateVotes:                 discard.NewCounter(),
 		ExpectedProposers:         discard.NewHistogram(),
+		ExpectedVoters:            discard.NewHistogram(),
+		VoteDeviation:             discard.NewHistogram(),
 	}
 }
