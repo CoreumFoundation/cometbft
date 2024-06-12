@@ -117,6 +117,12 @@ type Metrics struct {
 
 	// ExpectedProposers shows if actual proposer is equal to expected.
 	ExpectedProposers metrics.Histogram `metrics_type:"summary" metrics_labels:"validator_address"`
+
+	// ExpectedVoters shows if actual validators vote.
+	ExpectedVoters metrics.Histogram `metrics_type:"summary" metrics_labels:"validator_address"`
+
+	// VoteDeviation shows the deviation of vote times.
+	VoteDeviation metrics.Histogram `metrics_type:"summary" metrics_labels:"validator_address"`
 }
 
 // RecordConsMetrics uses for recording the block related metrics during fast-sync.
