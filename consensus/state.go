@@ -1893,6 +1893,25 @@ func (cs *State) recordMetrics(height int64, block *types.Block) {
 	cs.metrics.BlockSizeBytes.Set(float64(block.Size()))
 	cs.metrics.ChainSizeBytes.Add(float64(block.Size()))
 	cs.metrics.CommittedHeight.Set(float64(block.Height))
+
+	var expectedProposerValue float64
+	if bytes.Equal(cs.RoundState.Validators.Proposer.Address.Bytes(), cs.state.Validators.Proposer.Address.Bytes()) {
+		expectedProposerValue = 1.0
+	}
+	cs.metrics.ExpectedProposers.With("validator_address", cs.state.Validators.Proposer.Address.String()).Observe(expectedProposerValue)
+
+	votes := cs.Votes.Precommits(cs.Round).List()
+	expectedVoters := map[string]float64{}
+	for _, vote := range votes {
+		valAddr := vote.ValidatorAddress.String()
+		expectedVoters[valAddr] = 1.0
+		cs.metrics.VoteDeviation.With("validator_address", valAddr).
+			Observe(float64(cs.CommitTime.Sub(vote.Timestamp) / time.Millisecond))
+	}
+	for _, val := range cs.RoundState.Validators.Validators {
+		valAddr := val.Address.String()
+		cs.metrics.ExpectedVoters.With("validator_address", valAddr).Observe(expectedVoters[valAddr])
+	}
 }
 
 //-----------------------------------------------------------------------------
