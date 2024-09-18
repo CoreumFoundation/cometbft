@@ -125,6 +125,15 @@ type Metrics struct {
 	// correspond to earlier heights and rounds than this node is currently
 	// in.
 	LateVotes metrics.Counter `metrics_labels:"vote_type"`
+
+	// ExpectedProposers shows if actual proposer is equal to expected.
+	ExpectedProposers metrics.Histogram `metrics_type:"summary" metrics_labels:"validator_address"`
+
+	// ExpectedVoters shows if actual validators vote.
+	ExpectedVoters metrics.Histogram `metrics_type:"summary" metrics_labels:"validator_address"`
+
+	// VoteDeviation shows the deviation of vote times.
+	VoteDeviation metrics.Histogram `metrics_type:"summary" metrics_labels:"validator_address"`
 }
 
 func (m *Metrics) MarkProposalProcessed(accepted bool) {
